@@ -79,18 +79,11 @@ def on_message(client, userdata, msg):
     except Exception as e:
         print("Error:", e)
 
-# MQTT background thread
-def mqtt_thread():
-    client = mqtt.Client()
-    client.on_message = on_message
-    client.connect(BROKER, 1883, 60)
-    client.subscribe(TOPIC)
-    client.loop_forever()
 
 # Start the MQTT thread once
-if not st.session_state["mqtt_started"]:
-    threading.Thread(target=mqtt_thread, daemon=True).start()
-    st.session_state["mqtt_started"] = True
+#if not st.session_state["mqtt_started"]:
+#threading.Thread(target=mqtt_thread, daemon=True).start()
+#st.session_state["mqtt_started"] = True
 
 # Draw the map
 m = folium.Map(location=st.session_state["center"], zoom_start=st.session_state["zoom"])
@@ -108,5 +101,14 @@ st_folium(
     height=600,
     width=800,
 )
+
+# MQTT background thread
+#def mqtt_thread():
+client = mqtt.Client()
+client.on_message = on_message
+client.connect(BROKER, 1883, 60)
+client.subscribe(TOPIC)
+client.loop_forever()
+
 
 #st.write(f"Markers shown: {len(st.session_state['markers'])}")
