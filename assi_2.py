@@ -5,6 +5,9 @@ from streamlit_folium import st_folium
 
 # Use Sydney (NSW) as starting center
 CENTER_START = [-33.8688, 151.2093]  # Sydney, NSW
+number = 5
+image_url = "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/NSW_marker.png/40px-NSW_marker.png"
+
 
 # Initialize session state
 if "markers" not in st.session_state:
@@ -28,7 +31,30 @@ with st.form("marker_form"):
 
 # Add marker if form was submitted
 if submitted:
-    marker = folium.Marker(location=[lat, lon], popup=label)
+    #marker = folium.Marker(location=[lat, lon], popup=label)
+    marker = folium.Marker(
+        location=[lat, lon],
+        icon=folium.DivIcon(
+            icon_size=(40, 40),
+            icon_anchor=(20, 20),
+            html=f"""
+            <div style="position: relative; width: 40px; height: 40px;">
+                <img src="{image_url}" style="width: 100%; height: 100%; border-radius: 50%;">
+                <div style="
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    font-size: 16px;
+                    font-weight: bold;
+                    color: white;
+                ">{number}</div>
+            </div>
+            """
+        ),
+        popup=folium.Popup(f"Market ID: {number}")
+    )
+
     st.session_state["markers"].append(marker)
     st.session_state["center"] = [lat, lon]
 
