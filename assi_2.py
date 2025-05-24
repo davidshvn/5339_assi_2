@@ -8,5 +8,5 @@ data = pd.DataFrame({
 })
 
 # Show the map
-st.title("📍 Basic Map in Streamlit")
+#st.title("Assi 2")
 st.map(data)
