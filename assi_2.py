@@ -11,6 +11,11 @@ from streamlit_autorefresh import st_autorefresh
 CENTER_START = [-33.8688, 151.2093]
 
 # Initialize session state
+import queue
+
+if "marker_queue" not in st.session_state:
+    st.session_state["marker_queue"] = queue.Queue()
+
 if "markers" not in st.session_state:
     st.session_state["markers"] = []
 
@@ -71,7 +76,9 @@ def on_message(client, userdata, msg):
                 ),
                 popup=f"{brand} #{number}"
             )
-            st.session_state["markers"].append(marker)
+            #st.session_state["markers"].append(marker)
+            st.session_state["marker_queue"].put(marker)
+
     except Exception as e:
         print("MQTT Error:", e)
 
@@ -90,6 +97,10 @@ if not st.session_state["mqtt_started"]:
 
 # Refresh every 2000ms (2 seconds)
 st_autorefresh(interval=2000, key="datarefresh")
+
+# Transfer new markers from the queue to the session state
+while not st.session_state["marker_queue"].empty():
+    st.session_state["markers"].append(st.session_state["marker_queue"].get())
 
 # Draw the map
 m = folium.Map(location=st.session_state["center"], zoom_start=st.session_state["zoom"])
