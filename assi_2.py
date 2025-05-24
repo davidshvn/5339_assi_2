@@ -95,12 +95,6 @@ client.loop_forever()
 #    threading.Thread(target=mqtt_thread, daemon=True).start()
 #    st.session_state["mqtt_started"] = True
 
-# Refresh every 2000ms (2 seconds)
-st_autorefresh(interval=2000, key="datarefresh")
-
-# Transfer new markers from the queue to the session state
-while not st.session_state["marker_queue"].empty():
-    st.session_state["markers"].append(st.session_state["marker_queue"].get())
 
 # Draw the map
 m = folium.Map(location=st.session_state["center"], zoom_start=st.session_state["zoom"])
@@ -120,3 +114,10 @@ st_folium(
 )
 
 st.write(f"Markers shown: {len(st.session_state['markers'])}")
+
+# Refresh every 2000ms (2 seconds)
+st_autorefresh(interval=2000, key="datarefresh")
+
+# Transfer new markers from the queue to the session state
+while not st.session_state["marker_queue"].empty():
+    st.session_state["markers"].append(st.session_state["marker_queue"].get())
