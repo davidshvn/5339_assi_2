@@ -27,6 +27,23 @@ markets = ["92", "94", "97"]
 default_index = markets.index("92")
 selected_market = st.selectbox("Fuel", markets, index=default_index)
 
+# Draw the map
+m = folium.Map(location=st.session_state["center"], zoom_start=st.session_state["zoom"])
+fg = folium.FeatureGroup(name="Markers")
+
+for marker in st.session_state["markers"]:
+    fg.add_child(marker)
+
+st_folium(
+    m,
+    center=st.session_state["center"],
+    zoom=st.session_state["zoom"],
+    key="nsw_random",
+    feature_group_to_add=fg,
+    height=600,
+    width=800,
+)
+
 for i in range(100):
     
     lat = random.uniform(LAT_MIN, LAT_MAX)
@@ -67,21 +84,3 @@ for i in range(100):
     st.session_state["markers"].append(marker)
 
     time.sleep(1)
-
-
-# Draw the map
-m = folium.Map(location=st.session_state["center"], zoom_start=st.session_state["zoom"])
-fg = folium.FeatureGroup(name="Markers")
-
-for marker in st.session_state["markers"]:
-    fg.add_child(marker)
-
-st_folium(
-    m,
-    center=st.session_state["center"],
-    zoom=st.session_state["zoom"],
-    key="nsw_random",
-    feature_group_to_add=fg,
-    height=600,
-    width=800,
-)
