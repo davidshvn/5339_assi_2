@@ -1,15 +1,14 @@
 import streamlit as st
 import folium
-import random
 from streamlit_folium import st_folium
+import random
 import time
+import json
+import threading
+import paho.mqtt.client as mqtt
 
 # NSW center (Sydney)
 CENTER_START = [-33.8688, 151.2093]
-
-# Sydney bounding box
-LAT_MIN, LAT_MAX = -34.3, -33.3
-LON_MIN, LON_MAX = 150.75, 151.5
 
 # Initialize session state
 if "markers" not in st.session_state:
@@ -21,11 +20,74 @@ if "center" not in st.session_state:
 if "zoom" not in st.session_state:
     st.session_state["zoom"] = 10
 
-#st.title("Random Market Generator in NSW")
+if "mqtt_started" not in st.session_state:
+    st.session_state["mqtt_started"] = False
 
+# Dropdown
 markets = ["92", "94", "97"]
-default_index = markets.index("92")
-selected_market = st.selectbox("Fuel", markets, index=default_index)
+selected_market = st.selectbox("Fuel", markets, index=0)
+
+# MQTT Setup
+BROKER = "test.mosquitto.org"
+TOPIC = "streamlit/demo/data"
+
+# MQTT callback
+def on_message(client, userdata, msg):
+    try:
+        payload = json.loads(msg.payload.decode())
+        lat = payload.get("lat")
+        lon = payload.get("lon")
+        label = payload.get("label", "Market")
+        number = payload.get("number", "?")
+        
+        if lat is not None and lon is not None:
+            image_url = "https://upload.wikimedia.org/wikipedia/en/thumb/e/e8/Shell_logo.svg/150px-Shell_logo.svg.png"
+            html = f"""
+            <div style="position: relative; width: 40px; height: 40px;">
+                <img src="{image_url}" style="width: 100%; height: 100%; border-radius: 50%;">
+                <div style="
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    font-size: 14px;
+                    font-weight: bold;
+                    color: white;
+                    text-shadow:
+                        -1px -1px 0 black,
+                         1px -1px 0 black,
+                        -1px  1px 0 black,
+                         1px  1px 0 black;
+                ">{number}</div>
+            </div>
+            """
+
+            marker = folium.Marker(
+                location=[lat, lon],
+                icon=folium.DivIcon(
+                    icon_size=(40, 40),
+                    icon_anchor=(20, 20),
+                    html=html
+                ),
+                popup=f"{label} #{number}"
+            )
+            st.session_state["markers"].append(marker)
+
+    except Exception as e:
+        print("Error:", e)
+
+# MQTT background thread
+def mqtt_thread():
+    client = mqtt.Client()
+    client.on_message = on_message
+    client.connect(BROKER, 1883, 60)
+    client.subscribe(TOPIC)
+    client.loop_forever()
+
+# Start the MQTT thread once
+if not st.session_state["mqtt_started"]:
+    threading.Thread(target=mqtt_thread, daemon=True).start()
+    st.session_state["mqtt_started"] = True
 
 # Draw the map
 m = folium.Map(location=st.session_state["center"], zoom_start=st.session_state["zoom"])
@@ -44,43 +106,4 @@ st_folium(
     width=800,
 )
 
-for i in range(100):
-    
-    lat = random.uniform(LAT_MIN, LAT_MAX)
-    lon = random.uniform(LON_MIN, LON_MAX)
-    number = random.randint(100, 999)
-
-    # Custom image + number marker
-    image_url = "https://upload.wikimedia.org/wikipedia/en/thumb/e/e8/Shell_logo.svg/150px-Shell_logo.svg.png"
-    html = f"""
-    <div style="position: relative; width: 40px; height: 40px;">
-        <img src="{image_url}" style="width: 100%; height: 100%; border-radius: 50%;">
-        <div style="
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 14px;
-            font-weight: bold;
-            color: white;
-            text-shadow:
-            -1px -1px 0 black,
-            1px -1px 0 black,
-            -1px  1px 0 black,
-            1px  1px 0 black;
-        ">{number}</div>
-    </div>
-    """
-
-    marker = folium.Marker(
-        location=[lat, lon],
-        icon=folium.DivIcon(
-            icon_size=(40, 40),
-            icon_anchor=(20, 20),
-            html=html
-        ),
-        popup=f"Market #{number}"
-    )
-    st.session_state["markers"].append(marker)
-
-    time.sleep(1)
+st.write(f"Markers shown: {len(st.session_state['markers'])}")
