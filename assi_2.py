@@ -83,17 +83,17 @@ def on_message(client, userdata, msg):
         print("MQTT Error:", e)
 
 # MQTT background thread
-def mqtt_thread():
-    client = mqtt.Client()
-    client.on_message = on_message
-    client.connect(BROKER, 1883, 60)
-    client.subscribe(TOPIC)
-    client.loop_forever()
+#def mqtt_thread():
+client = mqtt.Client()
+client.on_message = on_message
+client.connect(BROKER, 1883, 60)
+client.subscribe(TOPIC)
+client.loop_forever()
 
 # Start MQTT thread once
-if not st.session_state["mqtt_started"]:
-    threading.Thread(target=mqtt_thread, daemon=True).start()
-    st.session_state["mqtt_started"] = True
+#if not st.session_state["mqtt_started"]:
+#    threading.Thread(target=mqtt_thread, daemon=True).start()
+#    st.session_state["mqtt_started"] = True
 
 # Refresh every 2000ms (2 seconds)
 st_autorefresh(interval=2000, key="datarefresh")
