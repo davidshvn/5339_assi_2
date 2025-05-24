@@ -6,7 +6,7 @@ from streamlit_folium import st_folium
 # Use Sydney (NSW) as starting center
 CENTER_START = [-33.8688, 151.2093]  # Sydney, NSW
 number = 5
-image_url = "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/NSW_marker.png/40px-NSW_marker.png"
+image_url = "https://upload.wikimedia.org/wikipedia/en/thumb/e/e8/Shell_logo.svg/150px-Shell_logo.svg.png"
 
 
 # Initialize session state
