@@ -93,7 +93,7 @@ client.loop_forever()
 # Start MQTT thread once
 #if not st.session_state["mqtt_started"]:
 #    threading.Thread(target=mqtt_thread, daemon=True).start()
-#    st.session_state["mqtt_started"] = True
+st.session_state["mqtt_started"] = True
 
 
 # Draw the map
