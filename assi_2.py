@@ -35,6 +35,9 @@ TOPIC = "streamlit/demo/data"
 def on_message(client, userdata, msg):
     try:
         payload = json.loads(msg.payload.decode())
+
+        print(payload)
+
         lat = payload.get("lat")
         lon = payload.get("lon")
         brand = payload.get("brand")
@@ -106,4 +109,4 @@ st_folium(
     width=800,
 )
 
-st.write(f"Markers shown: {len(st.session_state['markers'])}")
+#st.write(f"Markers shown: {len(st.session_state['markers'])}")
