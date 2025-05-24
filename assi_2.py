@@ -2,7 +2,6 @@ import streamlit as st
 import folium
 from streamlit_folium import st_folium
 import random
-import time
 import json
 import threading
 import paho.mqtt.client as mqtt
@@ -35,14 +34,11 @@ TOPIC = "streamlit/demo/data"
 def on_message(client, userdata, msg):
     try:
         payload = json.loads(msg.payload.decode())
-
-        print(payload)
-
         lat = payload.get("lat")
         lon = payload.get("lon")
-        brand = payload.get("brand")
-        number = payload.get("94")
-        
+        brand = payload.get("brand", "Brand")
+        number = payload.get(selected_market, "?")  # Use the selected market
+
         if lat is not None and lon is not None:
             image_url = "https://upload.wikimedia.org/wikipedia/en/thumb/e/e8/Shell_logo.svg/150px-Shell_logo.svg.png"
             html = f"""
@@ -75,15 +71,21 @@ def on_message(client, userdata, msg):
                 popup=f"{brand} #{number}"
             )
             st.session_state["markers"].append(marker)
-
     except Exception as e:
-        print("Error:", e)
+        print("MQTT Error:", e)
 
+# MQTT background thread
+def mqtt_thread():
+    client = mqtt.Client()
+    client.on_message = on_message
+    client.connect(BROKER, 1883, 60)
+    client.subscribe(TOPIC)
+    client.loop_forever()
 
-# Start the MQTT thread once
-#if not st.session_state["mqtt_started"]:
-#threading.Thread(target=mqtt_thread, daemon=True).start()
-#st.session_state["mqtt_started"] = True
+# Start MQTT thread once
+if not st.session_state["mqtt_started"]:
+    threading.Thread(target=mqtt_thread, daemon=True).start()
+    st.session_state["mqtt_started"] = True
 
 # Draw the map
 m = folium.Map(location=st.session_state["center"], zoom_start=st.session_state["zoom"])
@@ -102,13 +104,4 @@ st_folium(
     width=800,
 )
 
-# MQTT background thread
-#def mqtt_thread():
-client = mqtt.Client()
-client.on_message = on_message
-client.connect(BROKER, 1883, 60)
-client.subscribe(TOPIC)
-client.loop_forever()
-
-
-#st.write(f"Markers shown: {len(st.session_state['markers'])}")
+st.write(f"Markers shown: {len(st.session_state['markers'])}")
