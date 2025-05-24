@@ -20,7 +20,7 @@ if "center" not in st.session_state:
 if "zoom" not in st.session_state:
     st.session_state["zoom"] = 10
 
-st.title("Random Market Generator in NSW")
+#st.title("Random Market Generator in NSW")
 
 markets = ["92", "94", "97"]
 default_index = markets.index("92")
