@@ -37,8 +37,8 @@ def on_message(client, userdata, msg):
         payload = json.loads(msg.payload.decode())
         lat = payload.get("lat")
         lon = payload.get("lon")
-        label = payload.get("label", "Market")
-        number = payload.get("number", "?")
+        brand = payload.get("brand")
+        number = payload.get("94")
         
         if lat is not None and lon is not None:
             image_url = "https://upload.wikimedia.org/wikipedia/en/thumb/e/e8/Shell_logo.svg/150px-Shell_logo.svg.png"
@@ -69,7 +69,7 @@ def on_message(client, userdata, msg):
                     icon_anchor=(20, 20),
                     html=html
                 ),
-                popup=f"{label} #{number}"
+                popup=f"{brand} #{number}"
             )
             st.session_state["markers"].append(marker)
 
