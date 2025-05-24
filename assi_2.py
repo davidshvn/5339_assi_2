@@ -82,14 +82,6 @@ def on_message(client, userdata, msg):
     except Exception as e:
         print("MQTT Error:", e)
 
-# MQTT background thread
-#def mqtt_thread():
-client = mqtt.Client()
-client.on_message = on_message
-client.connect(BROKER, 1883, 60)
-client.subscribe(TOPIC)
-client.loop_forever()
-
 # Start MQTT thread once
 #if not st.session_state["mqtt_started"]:
 #    threading.Thread(target=mqtt_thread, daemon=True).start()
@@ -121,3 +113,11 @@ st_autorefresh(interval=2000, key="datarefresh")
 # Transfer new markers from the queue to the session state
 while not st.session_state["marker_queue"].empty():
     st.session_state["markers"].append(st.session_state["marker_queue"].get())
+
+# MQTT background thread
+#def mqtt_thread():
+client = mqtt.Client()
+client.on_message = on_message
+client.connect(BROKER, 1883, 60)
+client.subscribe(TOPIC)
+client.loop_forever()
