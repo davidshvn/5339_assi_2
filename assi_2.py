@@ -5,6 +5,7 @@ import random
 import json
 import threading
 import paho.mqtt.client as mqtt
+from streamlit_autorefresh import st_autorefresh
 
 # NSW center (Sydney)
 CENTER_START = [-33.8688, 151.2093]
@@ -86,6 +87,9 @@ def mqtt_thread():
 if not st.session_state["mqtt_started"]:
     threading.Thread(target=mqtt_thread, daemon=True).start()
     st.session_state["mqtt_started"] = True
+
+# Refresh every 2000ms (2 seconds)
+st_autorefresh(interval=2000, key="datarefresh")
 
 # Draw the map
 m = folium.Map(location=st.session_state["center"], zoom_start=st.session_state["zoom"])
