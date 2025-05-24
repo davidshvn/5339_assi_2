@@ -23,7 +23,7 @@ if "zoom" not in st.session_state:
 st.title("Random Market Generator in NSW")
 
 # Input: how many random markers?
-num_markers = st.number_input("How many random markers to add?", min_value=1, max_value=50, value=5)
+num_markers = st.number_input("How many random markers to add?", min_value=1, max_value=50, value=1)
 if st.button("Add Random Markers"):
     for i in range(num_markers):
 
