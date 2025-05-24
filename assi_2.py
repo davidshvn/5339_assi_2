@@ -2,13 +2,14 @@ import streamlit as st
 import folium
 import random
 from streamlit_folium import st_folium
+import time
 
 # NSW center (Sydney)
 CENTER_START = [-33.8688, 151.2093]
 
 # Sydney bounding box
-LAT_MIN, LAT_MAX = -34.25, -33.35
-LON_MIN, LON_MAX = 150.75, 151.15
+LAT_MIN, LAT_MAX = -34.3, -33.3
+LON_MIN, LON_MAX = 150.75, 151.5
 
 # Initialize session state
 if "markers" not in st.session_state:
@@ -26,7 +27,7 @@ markets = ["92", "94", "97"]
 default_index = markets.index("92")
 selected_market = st.selectbox("Fuel", markets, index=default_index)
 
-if st.button("Add Random Markers"):
+for i in range(100):
     
     lat = random.uniform(LAT_MIN, LAT_MAX)
     lon = random.uniform(LON_MIN, LON_MAX)
@@ -64,6 +65,9 @@ if st.button("Add Random Markers"):
         popup=f"Market #{number}"
     )
     st.session_state["markers"].append(marker)
+
+    time.sleep(1)
+
 
 # Draw the map
 m = folium.Map(location=st.session_state["center"], zoom_start=st.session_state["zoom"])
