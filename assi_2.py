@@ -6,9 +6,9 @@ from streamlit_folium import st_folium
 # NSW center (Sydney)
 CENTER_START = [-33.8688, 151.2093]
 
-# Bounds for random generation in NSW
-LAT_MIN, LAT_MAX = -37.5, -28.0
-LON_MIN, LON_MAX = 140.9, 153.6
+# Sydney bounding box
+LAT_MIN, LAT_MAX = -34.10, -33.50
+LON_MIN, LON_MAX = 150.50, 151.40
 
 # Initialize session state
 if "markers" not in st.session_state:
@@ -18,7 +18,7 @@ if "center" not in st.session_state:
     st.session_state["center"] = CENTER_START
 
 if "zoom" not in st.session_state:
-    st.session_state["zoom"] = 6
+    st.session_state["zoom"] = 10
 
 st.title("Random Market Generator in NSW")
 
