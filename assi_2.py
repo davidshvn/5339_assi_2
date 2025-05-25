@@ -121,14 +121,7 @@ def on_message(client, userdata, msg):
     except Exception as e:
         print("MQTT error:", e)
 
-# -- MQTT THREAD --
-#def mqtt_thread(marker_queue):
-#client = mqtt.Client(userdata={"queue": marker_queue})
-client = mqtt.Client(userdata={"queue": st.session_state["marker_queue"]})
-client.on_message = on_message
-client.connect(BROKER, 1883, 60)
-client.subscribe(TOPIC)
-client.loop_forever()
+
 
 # -- START THREAD ONCE --
 #if not st.session_state["mqtt_started"]:
@@ -156,3 +149,12 @@ st_folium(
 
 # Debugging
 st.write(f"Markers shown: {len(st.session_state['markers'])}")
+
+# -- MQTT THREAD --
+#def mqtt_thread(marker_queue):
+#client = mqtt.Client(userdata={"queue": marker_queue})
+client = mqtt.Client(userdata={"queue": st.session_state["marker_queue"]})
+client.on_message = on_message
+client.connect(BROKER, 1883, 60)
+client.subscribe(TOPIC)
+client.loop_forever()
