@@ -122,20 +122,21 @@ def on_message(client, userdata, msg):
         print("MQTT error:", e)
 
 # -- MQTT THREAD --
-def mqtt_thread(marker_queue):
-    client = mqtt.Client(userdata={"queue": marker_queue})
-    client.on_message = on_message
-    client.connect(BROKER, 1883, 60)
-    client.subscribe(TOPIC)
-    client.loop_forever()
+#def mqtt_thread(marker_queue):
+#client = mqtt.Client(userdata={"queue": marker_queue})
+client = mqtt.Client(userdata={"queue": st.session_state["marker_queue"]})
+client.on_message = on_message
+client.connect(BROKER, 1883, 60)
+client.subscribe(TOPIC)
+client.loop_forever()
 
 # -- START THREAD ONCE --
-if not st.session_state["mqtt_started"]:
-    threading.Thread(target=mqtt_thread, args=(st.session_state["marker_queue"],), daemon=True).start()
-    st.session_state["mqtt_started"] = True
+#if not st.session_state["mqtt_started"]:
+#    threading.Thread(target=mqtt_thread, args=(st.session_state["marker_queue"],), daemon=True).start()
+#    st.session_state["mqtt_started"] = True
 
 # -- AUTORERUN TO SHOW NEW MARKERS --
-st_autorefresh(interval=10000, key="autorefresh")
+#st_autorefresh(interval=10000, key="autorefresh")
 
 # -- DRAW MAP --
 m = folium.Map(location=st.session_state["center"], zoom_start=st.session_state["zoom"])
