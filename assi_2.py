@@ -35,6 +35,11 @@ while not st.session_state["marker_queue"].empty():
     marker = st.session_state["marker_queue"].get()
     st.session_state["markers"].append(marker)
 
+
+# -- DROPDOWN (NOT FILTERING IN THIS DEMO) --
+markets = ["92", "94", "97"]
+selected = st.selectbox("Fuel", markets, index=0)
+
 # -- MQTT CALLBACK --
 def on_message(client, userdata, msg):
     try:
@@ -42,7 +47,13 @@ def on_message(client, userdata, msg):
         lat = payload.get("lat")
         lon = payload.get("lon")
         brand = payload.get("brand")
-        number = payload.get("94")
+
+        prices = {}
+        prices["92"] = payload.get("92")
+        prices["94"] = payload.get("94")
+        prices["97"] = payload.get("97")
+
+        number = prices[selected]
 
         if lat is not None and lon is not None:
             image_url = "https://upload.wikimedia.org/wikipedia/en/thumb/e/e8/Shell_logo.svg/150px-Shell_logo.svg.png"
@@ -65,25 +76,25 @@ def on_message(client, userdata, msg):
                 ">{number}</div>
             </div>
             """
-            popup_html = """
+            popup_html = f"""
                 <div>
                     <table style="border-collapse: collapse; width: 150px;">
                         <tr>
-                            <td style="padding: 4px;"><b>Fuel</b></td>
-                            <td style="padding: 4px;">92</td>
+                            <td style="padding: 4px;"><b>92</b></td>
+                            <td style="padding: 4px;">{prices["92"]}</td>
                         </tr>
                         <tr>
-                            <td style="padding: 4px;"><b>Price</b></td>
-                            <td style="padding: 4px;">$1.78</td>
+                            <td style="padding: 4px;"><b>94</b></td>
+                            <td style="padding: 4px;">{prices["94"]}</td>
                         </tr>
                         <tr>
-                            <td style="padding: 4px;"><b>Updated</b></td>
-                            <td style="padding: 4px;">2 min ago</td>
+                            <td style="padding: 4px;"><b>97</b></td>
+                            <td style="padding: 4px;">{prices["97"]}</td>
                         </tr>
                     </table>
                 </div>
             """
-            popup = folium.Popup(popup_html, max_width=250)
+            popup = folium.Popup(popup_html, max_width=150)
 
             marker = folium.Marker(
                 location=[lat, lon],
@@ -115,10 +126,6 @@ if not st.session_state["mqtt_started"]:
 
 # -- AUTORERUN TO SHOW NEW MARKERS --
 st_autorefresh(interval=10000, key="autorefresh")
-
-# -- DROPDOWN (NOT FILTERING IN THIS DEMO) --
-markets = ["92", "94", "97"]
-st.selectbox("Fuel", markets, index=0)
 
 # -- DRAW MAP --
 m = folium.Map(location=st.session_state["center"], zoom_start=st.session_state["zoom"])
