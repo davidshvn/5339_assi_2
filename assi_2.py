@@ -65,6 +65,26 @@ def on_message(client, userdata, msg):
                 ">{number}</div>
             </div>
             """
+            popup_html = """
+                <div>
+                    <table style="border-collapse: collapse; width: 150px;">
+                        <tr>
+                            <td style="padding: 4px;"><b>Fuel</b></td>
+                            <td style="padding: 4px;">92</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px;"><b>Price</b></td>
+                            <td style="padding: 4px;">$1.78</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px;"><b>Updated</b></td>
+                            <td style="padding: 4px;">2 min ago</td>
+                        </tr>
+                    </table>
+                </div>
+            """
+            popup = folium.Popup(popup_html, max_width=250)
+
             marker = folium.Marker(
                 location=[lat, lon],
                 icon=folium.DivIcon(
@@ -72,7 +92,7 @@ def on_message(client, userdata, msg):
                     icon_anchor=(20, 20),
                     html=html
                 ),
-                popup=f"{brand} #{number}"
+                popup=popup
             )
             # SAFELY ADD TO QUEUE
             userdata["queue"].put(marker)
