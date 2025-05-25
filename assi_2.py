@@ -14,6 +14,20 @@ BROKER = "test.mosquitto.org"
 TOPIC = "streamlit/demo/data"
 CENTER_START = [-33.8688, 151.2093]  # Sydney center
 
+market_data = {
+    "92": 178,
+    "94": 182,
+    "97": 191
+}
+
+# Track selected market in a global variable
+if "selected_market" not in st.session_state:
+    st.session_state["selected_market"] = "92"
+
+# UI dropdown to select market
+selected_market = st.selectbox("Fuel", list(market_data.keys()), index=0)
+st.session_state["selected_market"] = selected_market
+
 # -- SESSION STATE SETUP --
 if "markers" not in st.session_state:
     st.session_state["markers"] = []
@@ -53,8 +67,8 @@ def on_message(client, userdata, msg):
         prices["94"] = payload.get("94")
         prices["97"] = payload.get("97")
 
-        print(selected)
-        number = prices[selected]
+        fuel_type = st.session_state.get("selected_market", "92")
+        number = market_data.get(fuel_type, "??")
 
         if lat is not None and lon is not None:
             image_url = "https://upload.wikimedia.org/wikipedia/en/thumb/e/e8/Shell_logo.svg/150px-Shell_logo.svg.png"
