@@ -20,6 +20,12 @@ market_data = {
     "97": 191
 }
 
+brands = {
+    "shell": "https://upload.wikimedia.org/wikipedia/en/thumb/e/e8/Shell_logo.svg/150px-Shell_logo.svg.png",
+    "711": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/7-eleven_logo.svg/272px-7-eleven_logo.svg.png",
+    "coles": "https://upload.wikimedia.org/wikipedia/en/thumb/4/4e/Ampol_Logo_May_2020.svg/109px-Ampol_Logo_May_2020.svg.png"
+}
+
 # Track selected market in a global variable
 if "selected_market" not in st.session_state:
     st.session_state["selected_market"] = "92"
@@ -66,7 +72,7 @@ def on_message(client, userdata, msg):
         number = prices[fuel_type]
 
         if lat is not None and lon is not None:
-            image_url = "https://upload.wikimedia.org/wikipedia/en/thumb/e/e8/Shell_logo.svg/150px-Shell_logo.svg.png"
+            image_url = brands[brand]
             html = f"""
             <div style="position: relative; width: 40px; height: 40px;">
                 <img src="{image_url}" style="width: 100%; height: 100%; border-radius: 50%;">
