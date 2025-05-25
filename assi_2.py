@@ -49,11 +49,6 @@ while not st.session_state["marker_queue"].empty():
     marker = st.session_state["marker_queue"].get()
     st.session_state["markers"].append(marker)
 
-
-# -- DROPDOWN (NOT FILTERING IN THIS DEMO) --
-markets = ["92", "94", "97"]
-selected = st.selectbox("Fuel", markets, index=0)
-
 # -- MQTT CALLBACK --
 def on_message(client, userdata, msg):
     try:
