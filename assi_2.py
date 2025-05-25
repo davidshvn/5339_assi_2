@@ -53,6 +53,7 @@ def on_message(client, userdata, msg):
         prices["94"] = payload.get("94")
         prices["97"] = payload.get("97")
 
+        print(selected)
         number = prices[selected]
 
         if lat is not None and lon is not None:
@@ -78,7 +79,7 @@ def on_message(client, userdata, msg):
             """
             popup_html = f"""
                 <div>
-                    <table style="border-collapse: collapse; width: 150px;">
+                    <table style="border-collapse: collapse; width: 80px;">
                         <tr>
                             <td style="padding: 4px;"><b>92</b></td>
                             <td style="padding: 4px;">{prices["92"]}</td>
@@ -94,7 +95,7 @@ def on_message(client, userdata, msg):
                     </table>
                 </div>
             """
-            popup = folium.Popup(popup_html, max_width=150)
+            popup = folium.Popup(popup_html, max_width=100)
 
             marker = folium.Marker(
                 location=[lat, lon],
