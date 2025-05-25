@@ -94,7 +94,7 @@ if not st.session_state["mqtt_started"]:
     st.session_state["mqtt_started"] = True
 
 # -- AUTORERUN TO SHOW NEW MARKERS --
-st_autorefresh(interval=2000, key="autorefresh")
+st_autorefresh(interval=1000, key="autorefresh")
 
 # -- DROPDOWN (NOT FILTERING IN THIS DEMO) --
 markets = ["92", "94", "97"]
