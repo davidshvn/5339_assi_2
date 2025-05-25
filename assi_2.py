@@ -2,20 +2,19 @@ import streamlit as st
 import folium
 from streamlit_folium import st_folium
 import random
+import time
 import json
 import threading
+import queue
 import paho.mqtt.client as mqtt
 from streamlit_autorefresh import st_autorefresh
 
-# NSW center (Sydney)
-CENTER_START = [-33.8688, 151.2093]
+# -- CONFIG --
+BROKER = "test.mosquitto.org"
+TOPIC = "streamlit/demo/data"
+CENTER_START = [-33.8688, 151.2093]  # Sydney center
 
-# Initialize session state
-import queue
-
-if "marker_queue" not in st.session_state:
-    st.session_state["marker_queue"] = queue.Queue()
-
+# -- SESSION STATE SETUP --
 if "markers" not in st.session_state:
     st.session_state["markers"] = []
 
@@ -25,25 +24,25 @@ if "center" not in st.session_state:
 if "zoom" not in st.session_state:
     st.session_state["zoom"] = 10
 
+if "marker_queue" not in st.session_state:
+    st.session_state["marker_queue"] = queue.Queue()
+
 if "mqtt_started" not in st.session_state:
     st.session_state["mqtt_started"] = False
 
-# Dropdown
-markets = ["92", "94", "97"]
-selected_market = st.selectbox("Fuel", markets, index=0)
+# -- PULL FROM QUEUE INTO SESSION STATE --
+while not st.session_state["marker_queue"].empty():
+    marker = st.session_state["marker_queue"].get()
+    st.session_state["markers"].append(marker)
 
-# MQTT Setup
-BROKER = "test.mosquitto.org"
-TOPIC = "streamlit/demo/data"
-
-# MQTT callback
+# -- MQTT CALLBACK --
 def on_message(client, userdata, msg):
     try:
         payload = json.loads(msg.payload.decode())
         lat = payload.get("lat")
         lon = payload.get("lon")
-        brand = payload.get("brand", "Brand")
-        number = payload.get(selected_market, "?")  # Use the selected market
+        brand = payload.get("brand")
+        number = payload.get("94")
 
         if lat is not None and lon is not None:
             image_url = "https://upload.wikimedia.org/wikipedia/en/thumb/e/e8/Shell_logo.svg/150px-Shell_logo.svg.png"
@@ -66,7 +65,6 @@ def on_message(client, userdata, msg):
                 ">{number}</div>
             </div>
             """
-
             marker = folium.Marker(
                 location=[lat, lon],
                 icon=folium.DivIcon(
@@ -76,22 +74,35 @@ def on_message(client, userdata, msg):
                 ),
                 popup=f"{brand} #{number}"
             )
-            #st.session_state["markers"].append(marker)
-            st.session_state["marker_queue"].put(marker)
+            # SAFELY ADD TO QUEUE
+            userdata["queue"].put(marker)
 
     except Exception as e:
-        print("MQTT Error:", e)
+        print("MQTT error:", e)
 
-# Start MQTT thread once
-#if not st.session_state["mqtt_started"]:
-#    threading.Thread(target=mqtt_thread, daemon=True).start()
-st.session_state["mqtt_started"] = True
+# -- MQTT THREAD --
+def mqtt_thread(marker_queue):
+    client = mqtt.Client(userdata={"queue": marker_queue})
+    client.on_message = on_message
+    client.connect(BROKER, 1883, 60)
+    client.subscribe(TOPIC)
+    client.loop_forever()
 
+# -- START THREAD ONCE --
+if not st.session_state["mqtt_started"]:
+    threading.Thread(target=mqtt_thread, args=(st.session_state["marker_queue"],), daemon=True).start()
+    st.session_state["mqtt_started"] = True
 
-# Draw the map
+# -- AUTORERUN TO SHOW NEW MARKERS --
+st_autorefresh(interval=2000, key="autorefresh")
+
+# -- DROPDOWN (NOT FILTERING IN THIS DEMO) --
+markets = ["92", "94", "97"]
+st.selectbox("Fuel", markets, index=0)
+
+# -- DRAW MAP --
 m = folium.Map(location=st.session_state["center"], zoom_start=st.session_state["zoom"])
 fg = folium.FeatureGroup(name="Markers")
-
 for marker in st.session_state["markers"]:
     fg.add_child(marker)
 
@@ -99,25 +110,11 @@ st_folium(
     m,
     center=st.session_state["center"],
     zoom=st.session_state["zoom"],
-    key="nsw_random",
+    key="nsw_map",
     feature_group_to_add=fg,
     height=600,
     width=800,
 )
 
+# Debugging
 st.write(f"Markers shown: {len(st.session_state['markers'])}")
-
-# Refresh every 2000ms (2 seconds)
-st_autorefresh(interval=2000, key="datarefresh")
-
-# Transfer new markers from the queue to the session state
-while not st.session_state["marker_queue"].empty():
-    st.session_state["markers"].append(st.session_state["marker_queue"].get())
-
-# MQTT background thread
-#def mqtt_thread():
-client = mqtt.Client()
-client.on_message = on_message
-client.connect(BROKER, 1883, 60)
-client.subscribe(TOPIC)
-client.loop_forever()
