@@ -63,7 +63,7 @@ def on_message(client, userdata, msg):
         prices["97"] = payload.get("97")
 
         fuel_type = st.session_state.get("selected_market", "92")
-        number = market_data.get(fuel_type, "??")
+        number = prices[fuel_type]
 
         if lat is not None and lon is not None:
             image_url = "https://upload.wikimedia.org/wikipedia/en/thumb/e/e8/Shell_logo.svg/150px-Shell_logo.svg.png"
