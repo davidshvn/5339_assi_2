@@ -129,7 +129,7 @@ def on_message(client, userdata, msg):
 #    st.session_state["mqtt_started"] = True
 
 # -- AUTORERUN TO SHOW NEW MARKERS --
-#st_autorefresh(interval=10000, key="autorefresh")
+st_autorefresh(interval=10000, key="autorefresh")
 
 # -- DRAW MAP --
 m = folium.Map(location=st.session_state["center"], zoom_start=st.session_state["zoom"])
