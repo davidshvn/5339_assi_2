@@ -12,18 +12,6 @@ from streamlit.components.v1 import html
 
 st.set_page_config(layout="wide")
 
-st.markdown("""
-    <style>
-        .main .block-container {
-            padding-left: 1rem;
-            padding-right: 1rem;
-            padding-top: 1rem;
-            padding-bottom: 0rem;
-            max-width: none;
-        }
-    </style>
-""", unsafe_allow_html=True)
-
 # -- CONFIG --
 BROKER = "test.mosquitto.org"
 TOPIC = "streamlit/demo/data"
