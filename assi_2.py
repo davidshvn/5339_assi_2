@@ -8,6 +8,7 @@ import threading
 import queue
 import paho.mqtt.client as mqtt
 from streamlit_autorefresh import st_autorefresh
+from streamlit.components.v1 import html
 
 # -- CONFIG --
 BROKER = "test.mosquitto.org"
@@ -156,6 +157,33 @@ st_folium(
 
 # Debugging
 st.write(f"Markers shown: {len(st.session_state['markers'])}")
+
+map_html = m.get_root().render()
+
+html(f"""
+<div style="position: relative; width: 100%; height: 600px;">
+    <div style="
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        z-index: 1000;
+        background-color: white;
+        padding: 10px;
+        border-radius: 5px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        font-family: sans-serif;
+    ">
+        <label for="dropdown">Dropdown:</label>
+        <select id="dropdown" onchange="console.log(this.value)">
+            <option value="opt1">Option 1</option>
+            <option value="opt2">Option 2</option>
+        </select>
+    </div>
+    <div style="width: 100%; height: 100%;">
+        {map_html}
+    </div>
+</div>
+""", height=600)
 
 # -- MQTT THREAD --
 #def mqtt_thread(marker_queue):
