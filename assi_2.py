@@ -10,6 +10,8 @@ import paho.mqtt.client as mqtt
 from streamlit_autorefresh import st_autorefresh
 from streamlit.components.v1 import html
 
+st.set_page_config(layout="wide")
+
 # -- CONFIG --
 BROKER = "test.mosquitto.org"
 TOPIC = "streamlit/demo/data"
