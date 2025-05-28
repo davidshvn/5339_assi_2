@@ -150,7 +150,8 @@ st_folium(
     key="nsw_map",
     feature_group_to_add=fg,
     height=600,
-    width=800,
+    #width=800,
+    use_container_width=True,
 )
 
 # Debugging
