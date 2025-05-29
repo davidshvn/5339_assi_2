@@ -17,11 +17,7 @@ BROKER = "test.mosquitto.org"
 TOPIC = "streamlit/demo/data"
 CENTER_START = [-33.8688, 151.2093]  # Sydney center
 
-market_data = {
-    "92": 178,
-    "94": 182,
-    "97": 191
-}
+market_data = ["92", "94", "97"]
 
 brands = {
     "shell": "https://upload.wikimedia.org/wikipedia/en/thumb/e/e8/Shell_logo.svg/150px-Shell_logo.svg.png",
@@ -34,7 +30,7 @@ if "selected_market" not in st.session_state:
     st.session_state["selected_market"] = "92"
 
 # UI dropdown to select market
-selected_market = st.selectbox("Fuel", list(market_data.keys()), index=0)
+selected_market = st.selectbox("Fuel", market_data, index=0)
 #st.session_state["selected_market"] = selected_market
 
 if selected_market != st.session_state["selected_market"]:
@@ -49,7 +45,7 @@ if "center" not in st.session_state:
     st.session_state["center"] = CENTER_START
 
 if "zoom" not in st.session_state:
-    st.session_state["zoom"] = 10
+    st.session_state["zoom"] = 9
 
 #if "marker_queue" not in st.session_state:
 #    st.session_state["marker_queue"] = queue.Queue()
@@ -69,14 +65,10 @@ def on_message(client, userdata, msg):
         lat = payload.get("lat")
         lon = payload.get("lon")
         brand = payload.get("brand")
-
-        prices = {}
-        prices["92"] = payload.get("92")
-        prices["94"] = payload.get("94")
-        prices["97"] = payload.get("97")
+        prices = payload.get("prices")
 
         fuel_type = st.session_state.get("selected_market", "92")
-        number = prices[fuel_type]
+        number = next((d["price"] for d in prices if d["fuel"] == fuel_type), None)
 
         if lat is not None and lon is not None:
             image_url = brands[brand]
@@ -99,21 +91,20 @@ def on_message(client, userdata, msg):
                 ">{number}</div>
             </div>
             """
+            rows = ""
+            for p in prices:
+                rows += f"""
+                    <tr>
+                        <td style="padding: 4px;"><b>{p.get("fuel")}</b></td>
+                        <td style="padding: 4px;">{p.get("price")}</td>
+                        <td style="padding: 4px;">{p.get("update_time")}</td>
+                    </tr>
+                """
+
             popup_html = f"""
                 <div>
                     <table style="border-collapse: collapse; width: 80px;">
-                        <tr>
-                            <td style="padding: 4px;"><b>92</b></td>
-                            <td style="padding: 4px;">{prices["92"]}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 4px;"><b>94</b></td>
-                            <td style="padding: 4px;">{prices["94"]}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 4px;"><b>97</b></td>
-                            <td style="padding: 4px;">{prices["97"]}</td>
-                        </tr>
+                        {rows}
                     </table>
                 </div>
             """
