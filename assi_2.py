@@ -47,7 +47,7 @@ if "center" not in st.session_state:
 if "zoom" not in st.session_state:
     st.session_state["zoom"] = 10
 
-i#f "marker_queue" not in st.session_state:
+#if "marker_queue" not in st.session_state:
 #    st.session_state["marker_queue"] = queue.Queue()
 
 # if "mqtt_started" not in st.session_state:
