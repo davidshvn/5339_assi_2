@@ -37,6 +37,10 @@ if "selected_market" not in st.session_state:
 selected_market = st.selectbox("Fuel", list(market_data.keys()), index=0)
 st.session_state["selected_market"] = selected_market
 
+if selected_market != st.session_state["selected_market"]:
+    st.session_state["selected_market"] = selected_market
+    st.session_state["markers"] = []
+
 # -- SESSION STATE SETUP --
 if "markers" not in st.session_state:
     st.session_state["markers"] = []
