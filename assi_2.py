@@ -91,7 +91,14 @@ def on_message(client, userdata, msg):
                 ">{number}</div>
             </div>
             """
-            rows = ""
+            rows = """
+                <tr>
+                    <td style="padding: 4px;"><b>Fuel</b></td>
+                    <td style="padding: 4px;"><b>Price</b></td>
+                    <td style="padding: 4px;"><b>Last updated</b></td>
+                </tr>
+            """
+
             for p in prices:
                 rows += f"""
                     <tr>
