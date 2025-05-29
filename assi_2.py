@@ -102,8 +102,8 @@ def on_message(client, userdata, msg):
                 """
 
             popup_html = f"""
-                <div>
-                    <table style="border-collapse: collapse; width: 80px;">
+                <div style="display: inline-block; padding: 4px;">
+                    <table style="border-collapse: collapse;">
                         {rows}
                     </table>
                 </div>
