@@ -47,16 +47,16 @@ if "center" not in st.session_state:
 if "zoom" not in st.session_state:
     st.session_state["zoom"] = 10
 
-if "marker_queue" not in st.session_state:
-    st.session_state["marker_queue"] = queue.Queue()
+i#f "marker_queue" not in st.session_state:
+#    st.session_state["marker_queue"] = queue.Queue()
 
-if "mqtt_started" not in st.session_state:
-    st.session_state["mqtt_started"] = False
+# if "mqtt_started" not in st.session_state:
+#     st.session_state["mqtt_started"] = False
 
 # -- PULL FROM QUEUE INTO SESSION STATE --
-while not st.session_state["marker_queue"].empty():
-    marker = st.session_state["marker_queue"].get()
-    st.session_state["markers"].append(marker)
+# while not st.session_state["marker_queue"].empty():
+#     marker = st.session_state["marker_queue"].get()
+#     st.session_state["markers"].append(marker)
 
 # -- MQTT CALLBACK --
 def on_message(client, userdata, msg):
@@ -125,7 +125,8 @@ def on_message(client, userdata, msg):
                 popup=popup
             )
             # SAFELY ADD TO QUEUE
-            userdata["queue"].put(marker)
+            #userdata["queue"].put(marker)
+            st.session_state["markers"].append(marker)
 
     except Exception as e:
         print("MQTT error:", e)
@@ -163,7 +164,8 @@ st.write(f"Markers shown: {len(st.session_state['markers'])}")
 # -- MQTT THREAD --
 #def mqtt_thread(marker_queue):
 #client = mqtt.Client(userdata={"queue": marker_queue})
-client = mqtt.Client(userdata={"queue": st.session_state["marker_queue"]})
+#client = mqtt.Client(userdata={"queue": st.session_state["marker_queue"]})
+client = mqtt.Client()
 client.on_message = on_message
 client.connect(BROKER, 1883, 60)
 client.subscribe(TOPIC)
