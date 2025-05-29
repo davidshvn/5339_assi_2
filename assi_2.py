@@ -108,7 +108,7 @@ def on_message(client, userdata, msg):
                     </table>
                 </div>
             """
-            popup = folium.Popup(popup_html, max_width=100)
+            popup = folium.Popup(popup_html, max_width=None)
 
             marker = folium.Marker(
                 location=[lat, lon],
